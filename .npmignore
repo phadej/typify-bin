@@ -1,0 +1,9 @@
+.gitignore
+.npmignore
+.jshintrc
+.eslintrc
+.travis.yml
+
+Makefile
+fixtures/
+
