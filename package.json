@@ -1,7 +1,7 @@
 {
   "name": "typify-bin",
   "description": "Runtime type-checking for JavaScript.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/phadej/typify",
   "author": {
     "name": "Oleg Grenrus",
@@ -23,7 +23,7 @@
   ],
   "main": "lib/instrument",
   "bin": {
-    "typify": "./bin/typify-bin.js"
+    "typify": "./bin/typify.js"
   },
   "engines": {
     "node": ">= 0.8.0"
