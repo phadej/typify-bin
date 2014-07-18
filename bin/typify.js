@@ -2,7 +2,7 @@
 
 "use strict";
 
-var optimist = require("optimist");
+var program = require("commander");
 var fs = require("fs");
 var which = require("which");
 var Module = require("module");
@@ -10,26 +10,14 @@ var path = require("path");
 var hook = require("istanbul").hook;
 var typify = require("typify");
 var instrument = require("../lib/instrument.js");
+var chalk = require("chalk");
 
-require("colors");
+var pkgJson = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json")).toString());
 
-optimist.usage("typify [options] -- command...");
-
-optimist.boolean("h").options("h", {
-  alias: "help",
-  describe: "Show brief help information",
-});
-
-optimist.boolean("v").options("v", {
-  alias: "version",
-  describe: "Display version information and exit.",
-});
-
-optimist.options("t", {
-  alias: "types",
-  string: true,
-  describe: "Type definitions",
-});
+program.usage("[options] -- command...");
+program.usage("[options] file.js");
+program.version(pkgJson.version);
+program.option("-t, --types <defs>", "Type definitions file");
 
 function hookMatcher(file) {
   file = path.resolve(file);
@@ -43,47 +31,36 @@ function hookMatcher(file) {
 }
 
 function cli(argv) {
-  var options = optimist.parse(argv);
+  program.parse(argv);
 
-  if (options.help) {
-    console.log(optimist.help());
-    return 0;
-  }
-
-  if (options.version) {
-    var pkg = JSON.parse(fs.readFileSync(__dirname + "/../package.json"));
-    console.log("jsgrep, part of jsstana version " + pkg.version);
-    return 0;
-  }
-
-  if (options._.length === 0) {
-    console.error("Error:".red + " command is required");
-    console.log(optimist.help());
+  if (program.args.length === 0) {
+    console.error(chalk.red("Error:") + " command is required");
+    console.log(program.outputHelp());
     return 1;
   }
 
-  if (options.types) {
-    if (typeof options.types !== "string" ||
-      !fs.existsSync(options.types) ||
-      !fs.statSync(options.types).isFile()) {
-      console.error("Error:".red + " types parameter should be a existing file");
-      console.log(optimist.help());
+  if (program.types) {
+    if (typeof program.types !== "string" ||
+      !fs.existsSync(program.types) ||
+      !fs.statSync(program.types).isFile()) {
+      console.error(chalk.red("Error:") + " types parameter should be a existing file");
+      console.log(program.outputHelp());
       return 1;
     }
 
     // Execute types file to get type definitions
-    var typesFile = path.resolve(options.types);
+    var typesFile = path.resolve(program.types);
     require(typesFile)(typify);
   }
 
-  var cmd = options._[0];
-  var args = options._.slice(1);
+  var cmd = program.args[0];
+  var args = program.args.slice(1);
 
   if (!fs.existsSync(cmd)) {
       try {
           cmd = which.sync(cmd);
       } catch (ex) {
-          console.error("Error:".red + "Unable to resolve file " + cmd);
+          console.error(chalk.red("Error:") + "Unable to resolve file " + cmd);
           return 1;
       }
   } else {
@@ -111,4 +88,4 @@ function cli(argv) {
   Module.runMain(cmd, null, true);
 }
 
-cli(process.argv.slice(2));
+cli(process.argv);
