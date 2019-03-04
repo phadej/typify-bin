@@ -1,8 +1,18 @@
 all : test 
 
-.PHONY : all test
+.PHONY : all test eslint david
 
-JSHINT=node_modules/.bin/jshint
+SRC=lib/*.js bin/typify.js
 
-test : 
-	$(JSHINT) bin lib
+BINDIR=node_modules/.bin
+
+DAVID=$(BINDIR)/david
+ESLINT=$(BINDIR)/eslint
+
+test : eslint david
+
+eslint :
+	$(ESLINT) $(SRC)
+
+david :
+	$(DAVID)
