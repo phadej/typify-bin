@@ -57,14 +57,14 @@ function cli(argv) {
   var args = program.args.slice(1);
 
   if (!fs.existsSync(cmd)) {
-      try {
-          cmd = which.sync(cmd);
-      } catch (ex) {
-          console.error(chalk.red("Error:") + "Unable to resolve file " + cmd);
-          return 1;
-      }
+    try {
+      cmd = which.sync(cmd);
+    } catch (ex) {
+      console.error(chalk.red("Error:") + "Unable to resolve file " + cmd);
+      return 1;
+    }
   } else {
-      cmd = path.resolve(cmd);
+    cmd = path.resolve(cmd);
   }
 
   var stats = new instrument.Stats();
